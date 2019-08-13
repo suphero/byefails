@@ -10,6 +10,7 @@ var maxHoursForSingleOrder = 24;
 var maxWordsPerSingleOrder = maxHoursForSingleOrder * maxWordsPerHour;
 
 exports.calculate = async (req, res) => {
+  console.log(req.body);
   var context = await getContext(req.body);
   var calculationResult = calculateWithContext(context);
 
@@ -37,7 +38,7 @@ async function getContext(body) {
 
 function calculateWithContext(context) {
   context.output = {};
-  
+
   getLocalCurrencyPrice(context);
   getSelectedCurrencyPrice(context);
   getPriceText(context);
