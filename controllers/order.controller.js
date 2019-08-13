@@ -36,26 +36,30 @@ async function getContext(body) {
 }
 
 function calculateWithContext(context) {
-  return {
-    price: getPriceText(context),
-    numberOfWords: getNumberOfWords(context),
-    maxPages: getMaxPages(context)
-  }
+  context.output = {};
+  
+  getLocalCurrencyPrice(context);
+  getSelectedCurrencyPrice(context);
+  getPriceText(context);
+  getNumberOfWords(context);
+  getMaxPages(context);
+
+  return context.output;
 }
 
 function getPriceText(context) {
-  var price = getSelectedCurrencyPrice(context);
+  var price = context.output.selectedCurrencyPrice;
   var currency = context.body.currency;
 
-  return price + " " + currency;
+  context.output.price = price + " " + currency;
 }
 
 function getSelectedCurrencyPrice(context) {
   var currencyMultiplier = context.currency.multiplier;
-  var priceInLocalCurrency = getLocalCurrencyPrice(context);
+  var priceInLocalCurrency = context.output.localCurrencyPrice;
   var price = priceInLocalCurrency * currencyMultiplier;
 
-  return Math.round(price * 100) / 100;
+  context.output.selectedCurrencyPrice = Math.round(price * 100) / 100;
 }
 
 function getLocalCurrencyPrice(context) {
@@ -67,13 +71,13 @@ function getLocalCurrencyPrice(context) {
 
   var price = (categoryPrice + urgencyCost) * spacingMultiplier * numberOfPages + extrasPrice;
 
-  return Math.round(price * 100) / 100;
+  context.output.localCurrencyPrice = Math.round(price * 100) / 100;
 }
 
 function getNumberOfWords(context) {
   var wordsPerPage = context.spacing.words;
   var numberOfPages = context.body.numberOfPages;
-  return wordsPerPage * numberOfPages;
+  context.output.numberOfWords = wordsPerPage * numberOfPages;
 }
 
 function getExtrasPrice(context) {
@@ -94,7 +98,7 @@ function getMaxPages(context) {
   var notMinifiedMaxWords = remainingHours * maxWordsPerHour;
   var maxWords = Math.min(notMinifiedMaxWords, maxWordsPerSingleOrder);
 
-  return Math.round(maxWords / wordsPerPage);
+  context.output.maxPages = Math.round(maxWords / wordsPerPage);
 }
 
 async function getCategory(category) {
