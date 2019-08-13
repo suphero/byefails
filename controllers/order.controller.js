@@ -94,9 +94,7 @@ function getMaxPages(context) {
   var notMinifiedMaxWords = remainingHours * maxWordsPerHour;
   var maxWords = Math.min(notMinifiedMaxWords, maxWordsPerSingleOrder);
 
-  var maxPages = Math.round(maxWords / wordsPerPage);
-
-  return maxPages;
+  return Math.round(maxWords / wordsPerPage);
 }
 
 async function getCategory(category) {
