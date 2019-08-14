@@ -103,11 +103,8 @@ function getExtrasPrice(context) {
 }
 
 function getMaxPages(context) {
-  var urgency = context.data.urgency;
-  var spacing = context.data.spacing;
-
-  var remainingHours = urgency.hours;
-  var wordsPerPage = spacing.words;
+  var remainingHours = context.data.urgency.hours;
+  var wordsPerPage = context.data.spacing.words;
   var notMinifiedMaxWords = remainingHours * maxWordsPerHour;
   var maxWords = Math.min(notMinifiedMaxWords, maxWordsPerSingleOrder);
 
