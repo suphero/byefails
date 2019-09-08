@@ -43,10 +43,10 @@ async function getContext(body) {
 
 function setDefaultVariables(body) {
   if (!body.category) { body.category = 1; }
-  if (!body.category) { body.currency = 'USD'; }
-  if (!body.category) { body.extras = []; }
-  if (!body.category) { body.spacing = 1; }
-  if (!body.category) { body.urgency = 1; }
+  if (!body.currency) { body.currency = 'USD'; }
+  if (!body.extras) { body.extras = []; }
+  if (!body.spacing) { body.spacing = 1; }
+  if (!body.urgency) { body.urgency = 1; }
 }
 
 function calculateWithContext(context) {
