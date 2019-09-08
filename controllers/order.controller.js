@@ -10,6 +10,7 @@ var maxHoursForSingleOrder = 24;
 var maxWordsPerSingleOrder = maxHoursForSingleOrder * maxWordsPerHour;
 
 exports.calculate = async (req, res) => {
+  setDefaultVariables(body);
   var context = await getContext(req.body);
   calculateWithContext(context);
   var calculationResult = prepareResult(context);
@@ -18,11 +19,11 @@ exports.calculate = async (req, res) => {
 };
 
 async function getContext(body) {
-  var categoryPromise = getCategory(body.category || 1);
-  var currencyPromise = getCurrency(body.currency || 'USD');
-  var extrasPromise = getExtras(body.extras || []);
-  var spacingPromise = getSpacing(body.spacing || 1);
-  var urgencyPromise = getUrgency(body.urgency || 1);
+  var categoryPromise = getCategory(body.category);
+  var currencyPromise = getCurrency(body.currency);
+  var extrasPromise = getExtras(body.extras);
+  var spacingPromise = getSpacing(body.spacing);
+  var urgencyPromise = getUrgency(body.urgency);
 
   var results = await Promise.all([categoryPromise, currencyPromise, extrasPromise, spacingPromise, urgencyPromise]);
 
@@ -38,6 +39,14 @@ async function getContext(body) {
     input: body,
     data
   }
+}
+
+function setDefaultVariables(body) {
+  if (!body.category) { body.category = 1; }
+  if (!body.category) { body.currency = 'USD'; }
+  if (!body.category) { body.extras = []; }
+  if (!body.category) { body.spacing = 1; }
+  if (!body.category) { body.urgency = 1; }
 }
 
 function calculateWithContext(context) {
