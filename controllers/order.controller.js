@@ -18,11 +18,11 @@ exports.calculate = async (req, res) => {
 };
 
 async function getContext(body) {
-  var categoryPromise = getCategory(body.category);
-  var currencyPromise = getCurrency(body.currency);
-  var extrasPromise = getExtras(body.extras);
-  var spacingPromise = getSpacing(body.spacing);
-  var urgencyPromise = getUrgency(body.urgency);
+  var categoryPromise = getCategory(body.category || 1);
+  var currencyPromise = getCurrency(body.currency || 'USD');
+  var extrasPromise = getExtras(body.extras || []);
+  var spacingPromise = getSpacing(body.spacing || 1);
+  var urgencyPromise = getUrgency(body.urgency || 1);
 
   var results = await Promise.all([categoryPromise, currencyPromise, extrasPromise, spacingPromise, urgencyPromise]);
 
