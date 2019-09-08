@@ -32,7 +32,7 @@ async function getContext(body) {
     currency: results[1],
     extras: results[2],
     spacing: results[3],
-    urgency: results[4]
+    urgency: results[4],
   };
 
   return {
