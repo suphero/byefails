@@ -10,7 +10,7 @@ var maxHoursForSingleOrder = 24;
 var maxWordsPerSingleOrder = maxHoursForSingleOrder * maxWordsPerHour;
 
 exports.calculate = async (req, res) => {
-  //setDefaultVariables(body);
+  setDefaultVariables(req.body);
   var context = await getContext(req.body);
   calculateWithContext(context);
   var calculationResult = prepareResult(context);
