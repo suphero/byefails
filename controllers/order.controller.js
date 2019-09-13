@@ -1,3 +1,4 @@
+const DocumentType = require('../models/documentType.model');
 const Category = require('../models/category.model');
 const Currency = require('../models/currency.model');
 const Extra = require('../models/extra.model');
@@ -19,20 +20,23 @@ exports.calculate = async (req, res) => {
 };
 
 async function getContext(body) {
+  var documentTypePromise = getDocumentType(body.documentType);
   var categoryPromise = getCategory(body.category);
   var currencyPromise = getCurrency(body.currency);
   var extrasPromise = getExtras(body.extras);
   var spacingPromise = getSpacing(body.spacing);
   var urgencyPromise = getUrgency(body.urgency);
 
-  var results = await Promise.all([categoryPromise, currencyPromise, extrasPromise, spacingPromise, urgencyPromise]);
+  var results = await Promise.all([documentTypePromise, categoryPromise, currencyPromise, extrasPromise, spacingPromise, urgencyPromise]);
+  console.log(results);
 
   var data = {
-    category: results[0],
-    currency: results[1],
-    extras: results[2],
-    spacing: results[3],
-    urgency: results[4],
+    documentType: results[0],
+    category: results[1],
+    currency: results[2],
+    extras: results[3],
+    spacing: results[4],
+    urgency: results[5],
   };
 
   return {
@@ -42,6 +46,7 @@ async function getContext(body) {
 }
 
 function setDefaultVariables(body) {
+  if (!body.documentType) { body.documentType = 1; }
   if (!body.category) { body.category = 1; }
   if (!body.currency) { body.currency = 'USD'; }
   if (!body.extras) { body.extras = []; }
@@ -85,13 +90,14 @@ function getSelectedCurrencyPrice(context) {
 }
 
 function getLocalCurrencyPrice(context) {
+  var documentTypeMultiplier = context.data.documentType.multiplier;
   var categoryPrice = context.data.category.price;
   var urgencyCost = context.data.urgency.price;
   var spacingMultiplier = context.data.spacing.priceMultiplier;
   var numberOfPages = context.input.numberOfPages;
   var extrasPrice = getExtrasPrice(context);
 
-  var price = (categoryPrice + urgencyCost) * spacingMultiplier * numberOfPages + extrasPrice;
+  var price = (categoryPrice + urgencyCost) * spacingMultiplier * numberOfPages * documentTypeMultiplier + extrasPrice;
 
   context.output.localCurrencyPrice = Math.round(price * 100) / 100;
 }
@@ -99,7 +105,8 @@ function getLocalCurrencyPrice(context) {
 function getNumberOfWords(context) {
   var wordsPerPage = context.data.spacing.words;
   var numberOfPages = context.input.numberOfPages;
-  context.output.numberOfWords = wordsPerPage * numberOfPages;
+  var documentTypeMultiplier = context.data.documentType.multiplier;
+  context.output.numberOfWords = wordsPerPage * numberOfPages * documentTypeMultiplier;
 }
 
 function getExtrasPrice(context) {
@@ -118,6 +125,10 @@ function getMaxPages(context) {
   var maxWords = Math.min(notMinifiedMaxWords, maxWordsPerSingleOrder);
 
   context.output.maxPages = Math.round(maxWords / wordsPerPage);
+}
+
+async function getDocumentType(documentType){
+  return await DocumentType.findById(documentType);
 }
 
 async function getCategory(category) {
