@@ -48,7 +48,7 @@ async function getContext(body) {
 function setDefaultVariables(body) {
   if (!body.documentType) { body.documentType = 1; }
   if (!body.category) { body.category = 1; }
-  if (!body.currency) { body.currency = 'USD'; }
+  if (!body.currency) { body.currency = 'TRY'; }
   if (!body.extras) { body.extras = []; }
   if (!body.spacing) { body.spacing = 1; }
   if (!body.urgency) { body.urgency = 1; }
