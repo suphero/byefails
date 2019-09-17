@@ -85,8 +85,10 @@ function getSelectedCurrencyPrice(context) {
   var currencyMultiplier = context.data.currency.multiplier;
   var priceInLocalCurrency = context.output.localCurrencyPrice;
   var price = priceInLocalCurrency * currencyMultiplier;
+  var precision = context.data.currency.precision;
+  var precisionMultiplier = Math.pow(10, precision);
 
-  context.output.selectedCurrencyPrice = Math.round(price * 100) / 100;
+  context.output.selectedCurrencyPrice = Math.round(price * precisionMultiplier) / precisionMultiplier;
 }
 
 function getLocalCurrencyPrice(context) {
