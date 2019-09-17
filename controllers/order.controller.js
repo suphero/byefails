@@ -28,7 +28,6 @@ async function getContext(body) {
   var urgencyPromise = getUrgency(body.urgency);
 
   var results = await Promise.all([documentTypePromise, categoryPromise, currencyPromise, extrasPromise, spacingPromise, urgencyPromise]);
-  console.log(results);
 
   var data = {
     documentType: results[0],
