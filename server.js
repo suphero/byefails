@@ -77,9 +77,7 @@ mongoose.connect(config.dbUrl, {
 
 // define a simple route
 app.get('/', (req, res) => {
-    res.json({
-        "message": "Welcome to Bye Fails application."
-    });
+    res.send("Welcome to Bye Fails application.");
 });
 
 // listen for requests
