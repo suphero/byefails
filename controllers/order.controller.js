@@ -93,12 +93,12 @@ function getSelectedCurrencyPrice(context) {
 function getLocalCurrencyPrice(context) {
   var documentTypeMultiplier = context.data.documentType.multiplier;
   var categoryPrice = context.data.category.price;
-  var urgencyCost = context.data.urgency.price;
+  var urgencyMultiplier = context.data.urgency.multiplier;
   var spacingMultiplier = context.data.spacing.priceMultiplier;
   var numberOfPages = context.input.numberOfPages;
   var extrasPrice = getExtrasPrice(context);
 
-  var price = (categoryPrice + urgencyCost) * spacingMultiplier * numberOfPages * documentTypeMultiplier + extrasPrice;
+  var price = categoryPrice * urgencyMultiplier * spacingMultiplier * numberOfPages * documentTypeMultiplier + extrasPrice;
 
   context.output.localCurrencyPrice = Math.round(price * 100) / 100;
 }
