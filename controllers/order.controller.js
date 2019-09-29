@@ -75,7 +75,7 @@ function prepareResult(context) {
 
 function getPriceText(context) {
   var price = context.output.selectedCurrencyPrice;
-  var currency = context.input.currency;
+  var currency = context.data.currency.icon;
 
   context.output.price = price + " " + currency;
 }
