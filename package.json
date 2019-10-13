@@ -2,11 +2,10 @@
   "name": "byefails",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "functions/server.js",
   "scripts": {
-    "deploy": "caprover deploy",
-    "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "netlify-lambda build express",
+    "start": "nodemon server-local.js"
   },
   "repository": {
     "type": "git",
@@ -14,14 +13,16 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
     "axios": "^0.19.0",
     "body-parser": "^1.19.0",
+    "caprover": "^2.0.2",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "mongoose": "^5.6.9"
-  },
-  "devDependencies": {
-    "caprover": "^2.0.2"
+    "mongoose": "^5.7.4",
+    "netlify-lambda": "^1.6.3",
+    "nodemon": "^1.19.3",
+    "serverless-http": "^2.3.0"
   }
 }

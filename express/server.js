@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const serverless = require('serverless-http');
 const config = require('./config');
 
 // create express app
@@ -87,3 +88,6 @@ app.listen(config.port, () => {
 
 // Require Notes routes
 require('./routes/order.routes.js')(app);
+
+module.exports = app;
+module.exports.handler = serverless(app);
