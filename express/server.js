@@ -4,6 +4,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const serverless = require('serverless-http');
 const config = require('./config');
+const router = express.Router();
 
 // create express app
 const app = express();
@@ -87,6 +88,7 @@ app.listen(config.port, () => {
 });
 
 // Require Notes routes
+app.use('/.netlify/functions/server', router);  // path must route to lambda
 require('./routes/order.routes.js')(app);
 
 module.exports = app;
