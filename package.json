@@ -20,7 +20,7 @@
     "caprover": "^2.0.2",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "mongoose": "^5.7.4",
+    "mongoose": "^5.7.5",
     "netlify-lambda": "^1.6.3",
     "nodemon": "^1.19.3",
     "serverless-http": "^2.3.0"
