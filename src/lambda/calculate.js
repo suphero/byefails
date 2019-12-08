@@ -1,5 +1,9 @@
-const { MongoClient } = require('mongodb')
-const { MONGODB_URI } = process.env
+const {
+  MongoClient
+} = require('mongodb')
+const {
+  MONGODB_URI
+} = process.env
 
 // Params
 var maxWordsPerHour = 200;
@@ -8,7 +12,7 @@ var maxWordsPerSingleOrder = maxHoursForSingleOrder * maxWordsPerHour;
 
 let cachedDb = null
 
-function connectToDatabase (uri) {
+function connectToDatabase(uri) {
   if (cachedDb) {
     console.log('using cached database instance')
     return Promise.resolve(cachedDb)
@@ -22,50 +26,56 @@ function connectToDatabase (uri) {
   })
 }
 
-exports.handler = async (event, _context, callback) => {
-  if (process.env.ENABLE_CORS && event.httpMethod === 'OPTIONS') {
+exports.handler = async (event, _context, _callback) => {
+  const headers = process.env.ENABLE_CORS ? {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+  } : {}
+
+  if (event.httpMethod === "POST") {
+    const params = JSON.parse(event.body);
+    setDefaultVariables(params);
+    var context = await getContext(params);
+    calculateWithContext(context);
+    var calculationResult = prepareResult(context);
+
     return {
+      headers,
       statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers':
-          'Origin, X-Requested-With, Content-Type, Accept',
-      },
-      body: JSON.stringify({message: 'You can use CORS'}),
+      body: JSON.stringify(calculationResult)
+    };
+  } else {
+    return {
+      headers,
+      statusCode: 200,
+      body: ''
     }
   }
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method Not Allowed" };
-  }
-
-  const params = JSON.parse(event.body);
-  setDefaultVariables(params);
-  var context = await getContext(params);
-  calculateWithContext(context);
-  var calculationResult = prepareResult(context);
-
-  const headers = process.env.ENABLE_CORS ? {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
-    } :
-    {}
-
-  return {
-    headers,
-    statusCode: 200,
-    body: JSON.stringify(calculationResult)
-  };
 };
 
 async function getContext(body) {
   const db = await connectToDatabase(MONGODB_URI);
 
-  var documentTypePromise = db.collection('documenttypes').findOne({_id: body.documentType});
-  var categoryPromise = db.collection('categories').findOne({_id: body.category});
-  var currencyPromise = db.collection('currencies').findOne({_id: body.currency});
-  var extrasPromise = db.collection('extras').find({_id : {$in : body.extras}}).toArray();
-  var spacingPromise = db.collection('spacings').findOne({_id: body.spacing});
-  var urgencyPromise = db.collection('urgencies').findOne({_id: body.urgency});
+  var documentTypePromise = db.collection('documenttypes').findOne({
+    _id: body.documentType
+  });
+  var categoryPromise = db.collection('categories').findOne({
+    _id: body.category
+  });
+  var currencyPromise = db.collection('currencies').findOne({
+    _id: body.currency
+  });
+  var extrasPromise = db.collection('extras').find({
+    _id: {
+      $in: body.extras
+    }
+  }).toArray();
+  var spacingPromise = db.collection('spacings').findOne({
+    _id: body.spacing
+  });
+  var urgencyPromise = db.collection('urgencies').findOne({
+    _id: body.urgency
+  });
 
   var results = await Promise.all([documentTypePromise, categoryPromise, currencyPromise, extrasPromise, spacingPromise, urgencyPromise]);
 
@@ -85,13 +95,27 @@ async function getContext(body) {
 }
 
 function setDefaultVariables(body) {
-  if (!body.documentType) { body.documentType = 1; }
-  if (!body.category) { body.category = 1; }
-  if (!body.currency) { body.currency = 'TRY'; }
-  if (!body.extras) { body.extras = []; }
-  if (!body.spacing) { body.spacing = 1; }
-  if (!body.urgency) { body.urgency = 1; }
-  if (!body.numberOfPages) { body.numberOfPages = 1; }
+  if (!body.documentType) {
+    body.documentType = 1;
+  }
+  if (!body.category) {
+    body.category = 1;
+  }
+  if (!body.currency) {
+    body.currency = 'TRY';
+  }
+  if (!body.extras) {
+    body.extras = [];
+  }
+  if (!body.spacing) {
+    body.spacing = 1;
+  }
+  if (!body.urgency) {
+    body.urgency = 1;
+  }
+  if (!body.numberOfPages) {
+    body.numberOfPages = 1;
+  }
 }
 
 function calculateWithContext(context) {
@@ -107,7 +131,9 @@ function calculateWithContext(context) {
 }
 
 function prepareResult(context) {
-  var result = { output: context.output };
+  var result = {
+    output: context.output
+  };
   if (context.input.returnData) {
     result.data = context.data;
   }
