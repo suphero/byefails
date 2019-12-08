@@ -33,7 +33,13 @@ exports.handler = async (event, _context) => {
   calculateWithContext(context);
   var calculationResult = prepareResult(context);
 
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+  };
+
   return {
+    headers,
     statusCode: 200,
     body: JSON.stringify(calculationResult)
   };
