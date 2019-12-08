@@ -1,31 +1,53 @@
-const DocumentType = require('../models/documentType.model');
-const Category = require('../models/category.model');
-const Currency = require('../models/currency.model');
-const Extra = require('../models/extra.model');
-const Spacing = require('../models/spacing.model');
-const Urgency = require('../models/urgency.model');
+const { MongoClient } = require('mongodb')
+const { MONGODB_URI } = process.env
 
 // Params
 var maxWordsPerHour = 200;
 var maxHoursForSingleOrder = 24;
 var maxWordsPerSingleOrder = maxHoursForSingleOrder * maxWordsPerHour;
 
-exports.calculate = async (req, res) => {
-  setDefaultVariables(req.body);
-  var context = await getContext(req.body);
+let cachedDb = null
+
+function connectToDatabase (uri) {
+  if (cachedDb) {
+    console.log('using cached database instance')
+    return Promise.resolve(cachedDb)
+  }
+
+  console.log('connecting to database')
+  return MongoClient.connect(uri).then((db) => {
+    console.log('connected')
+    cachedDb = db
+    return cachedDb
+  })
+}
+
+exports.handler = async (event, _context) => {
+  if (event.httpMethod !== "POST") {
+    return { statusCode: 405, body: "Method Not Allowed" };
+  }
+
+  const params = JSON.parse(event.body);
+  setDefaultVariables(params);
+  var context = await getContext(params);
   calculateWithContext(context);
   var calculationResult = prepareResult(context);
 
-  res.send(calculationResult);
+  return {
+    statusCode: 200,
+    body: JSON.stringify(calculationResult)
+  };
 };
 
 async function getContext(body) {
-  var documentTypePromise = getDocumentType(body.documentType);
-  var categoryPromise = getCategory(body.category);
-  var currencyPromise = getCurrency(body.currency);
-  var extrasPromise = getExtras(body.extras);
-  var spacingPromise = getSpacing(body.spacing);
-  var urgencyPromise = getUrgency(body.urgency);
+  const db = await connectToDatabase(MONGODB_URI);
+
+  var documentTypePromise = db.collection('documenttypes').findOne({_id: body.documentType});
+  var categoryPromise = db.collection('categories').findOne({_id: body.category});
+  var currencyPromise = db.collection('currencies').findOne({_id: body.currency});
+  var extrasPromise = db.collection('extras').find({_id : {$in : body.extras}}).toArray();
+  var spacingPromise = db.collection('spacings').findOne({_id: body.spacing});
+  var urgencyPromise = db.collection('urgencies').findOne({_id: body.urgency});
 
   var results = await Promise.all([documentTypePromise, categoryPromise, currencyPromise, extrasPromise, spacingPromise, urgencyPromise]);
 
@@ -51,6 +73,7 @@ function setDefaultVariables(body) {
   if (!body.extras) { body.extras = []; }
   if (!body.spacing) { body.spacing = 1; }
   if (!body.urgency) { body.urgency = 1; }
+  if (!body.numberOfPages) { body.numberOfPages = 1; }
 }
 
 function calculateWithContext(context) {
@@ -80,7 +103,7 @@ function getPriceText(context) {
   context.output.price = price + " " + currency;
 }
 
-function getSelectedCurrencyPrice(context) {
+function getSelectedCurrencyPrice(context) {
   var currencyMultiplier = context.data.currency.multiplier;
   var priceInLocalCurrency = context.output.localCurrencyPrice;
   var price = priceInLocalCurrency * currencyMultiplier;
@@ -110,7 +133,7 @@ function getNumberOfWords(context) {
   context.output.numberOfWords = wordsPerPage * numberOfPages * documentTypeMultiplier;
 }
 
-function getExtrasPrice(context) {
+function getExtrasPrice(context) {
   var value = 0;
   Array.prototype.forEach.call(context.data.extras, extra => {
     var extraPrice = extra.perPage ? extra.price * context.input.numberOfPages : extra.price;
@@ -127,28 +150,4 @@ function getMaxPages(context) {
   var maxWords = Math.min(notMinifiedMaxWords, maxWordsPerSingleOrder);
 
   context.output.maxPages = Math.round(maxWords / (wordsPerPage * documentTypeMultiplier));
-}
-
-async function getDocumentType(documentType){
-  return await DocumentType.findById(documentType);
-}
-
-async function getCategory(category) {
-  return await Category.findById(category);
-}
-
-async function getCurrency(currency) {
-  return await Currency.findById(currency)
-}
-
-async function getSpacing(spacing) {
-  return await Spacing.findById(spacing);
-}
-
-async function getUrgency(urgency) {
-  return await Urgency.findById(urgency);
-}
-
-async function getExtras(extras) {
-  return await Extra.find({_id : {$in : extras}});
 }
