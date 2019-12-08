@@ -30,6 +30,7 @@ exports.handler = async (event, _context, _callback) => {
   const headers = process.env.ENABLE_CORS ? {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+    'Access-Control-Allow-Methods': '*'
   } : {}
 
   if (event.httpMethod === "POST") {
