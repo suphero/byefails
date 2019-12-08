@@ -22,7 +22,22 @@ function connectToDatabase (uri) {
   })
 }
 
+function preflight() {
+  return {
+    statusCode: 204,
+    headers: {
+      'content-type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT',
+    },
+    body: {},
+  };
+}
+
 exports.handler = async (event, _context) => {
+  if (event.httpMethod === 'OPTIONS') {
+    return preflight();
+  }
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
