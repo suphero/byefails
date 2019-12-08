@@ -22,21 +22,17 @@ function connectToDatabase (uri) {
   })
 }
 
-function preflight() {
-  return {
-    statusCode: 204,
-    headers: {
-      'content-type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT',
-    },
-    body: {},
-  };
-}
-
-exports.handler = async (event, _context) => {
-  if (event.httpMethod === 'OPTIONS') {
-    return preflight();
+exports.handler = async (event, _context, callback) => {
+  if (process.env.ENABLE_CORS && event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers':
+          'Origin, X-Requested-With, Content-Type, Accept',
+      },
+      body: JSON.stringify({message: 'You can use CORS'}),
+    }
   }
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
@@ -48,13 +44,14 @@ exports.handler = async (event, _context) => {
   calculateWithContext(context);
   var calculationResult = prepareResult(context);
 
-  return {
-    headers: {
-      'content-type': 'application/json',
+  const headers = process.env.ENABLE_CORS ? {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
-      'Access-Control-Allow-Headers': 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers,X-Access-Token,XKey,Authorization'
-    },
+      'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+    } :
+    {}
+
+  return {
+    headers,
     statusCode: 200,
     body: JSON.stringify(calculationResult)
   };
