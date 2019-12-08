@@ -27,11 +27,11 @@ function connectToDatabase(uri) {
 }
 
 exports.handler = async (event, _context, _callback) => {
-  const headers = process.env.ENABLE_CORS ? {
+  const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
-    'Access-Control-Allow-Methods': '*'
-  } : {}
+    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+  };
 
   if (event.httpMethod === "POST") {
     const params = JSON.parse(event.body);
