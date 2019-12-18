@@ -1,2 +1,4 @@
 [build]
-  functions = "src/lambda"
+  command = "yarn build"
+  publish = "dist/client"
+  functions = "dist/server"

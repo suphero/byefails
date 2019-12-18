@@ -100,24 +100,36 @@ async function getContext(body) {
 function setDefaultVariables(body) {
   if (!body.documentType) {
     body.documentType = 1;
+  } else {
+    body.documentType = parseInt(body.documentType);
   }
   if (!body.category) {
     body.category = 1;
+  } else {
+    body.category = parseInt(body.category);
   }
   if (!body.currency) {
     body.currency = 'TRY';
   }
   if (!body.extras) {
     body.extras = [];
+  } else {
+    body.extras = body.extras.map(x => parseInt(x));
   }
   if (!body.spacing) {
     body.spacing = 1;
+  } else {
+    body.spacing = parseInt(body.spacing);
   }
   if (!body.urgency) {
     body.urgency = 1;
+  } else {
+    body.urgency = parseInt(body.urgency);
   }
   if (!body.numberOfPages) {
     body.numberOfPages = 1;
+  } else {
+    body.numberOfPages = parseInt(body.numberOfPages);
   }
 }
 
