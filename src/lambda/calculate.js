@@ -51,7 +51,7 @@ exports.handler = async (event, _context, _callback) => {
     return {
       headers,
       statusCode: 200,
-      body: 'Welcome'
+      body: JSON.stringify({Hello: "World"})
     }
   }
 };
