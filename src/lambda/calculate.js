@@ -130,7 +130,7 @@ function setDefaultVariables(body) {
     body.numberOfPages = 1;
   } else {
     body.numberOfPages = parseInt(body.numberOfPages);
-  } 
+  }
 }
 
 function calculateWithContext(context) {
